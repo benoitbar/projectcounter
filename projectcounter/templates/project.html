@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load i18n humanize %}
+
+{% block main %}
+    <div class="well">
+        <div class="row-fluid">
+            <div class="span6">
+                <h1>
+                    {{project.name|capfirst}} ({% blocktrans count counter=total_days %} {{counter}} jour{% plural %}{{counter}} jours{% endblocktrans %})
+                    {% if user.is_authenticated %}
+                    <a href="javascript:(function(){f='http://{{request.get_host}}{% url core.views.toggle request.user.id project.id %}';a=function(){if(!window.open(f,'Project Counter','location=no,links=no,scrollbars=no,toolbar=no,width=500,height=310'))location.href=f};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})()" class="bookmark btn btn-mini"><i class="icon-bookmark"></i> {{project.name|capfirst}}</a>
+                    {% endif %}
+                </h1>
+                <p>{{project.description}}<p>
+            </div>
+            <div class="span6">
+            {% if user.is_authenticated %}
+                {% if is_started %}
+                <a href="{% url core.views.stop project.id %}" class="pull-right btn btn-danger">{% trans "Stop" %}</a>
+                {% else %}
+                <a href="{% url core.views.start project.id %}" class="pull-right btn btn-primary">{% trans "Start" %}</a>
+                {% endif %}
+            {% endif %}
+            </div>
+        </div>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>{% trans "Début" %}</th>
+                <th>{% trans "Fin" %}</th>
+                <th>{% trans "Temps" %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for counter in counters %}
+            <tr>
+                <td>{{counter.start_date|date:"d/m/Y à H:i:s"}}</td>
+                <td>{{counter.end_date|date:"d/m/Y à H:i:s"}}</td>
+                <td>{{counter.get_days}} {% trans "jour(s)" %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr class="hr">
+                <th></th>
+                <th>{% trans "Utilisateur" %}</th>
+                <th>{% trans "Total" %}</th>
+            </tr>
+            {% for user_id, user_days in user_total_days.items %}
+            <tr>
+                <td></td>
+                <td>{{user_days.name}}</td>
+                <td><strong>{% blocktrans count counter=user_days.days %}{{counter}} jour{% plural %}{{counter}} jours{% endblocktrans %}</strong></td>
+            </tr>
+            {% endfor %}
+            <tr class="hr">
+                <td></td>
+                <td><big><strong>{% trans "TOTAL" %}</strong></big></td>
+                <td><big><strong>{% blocktrans count counter=total_days %}{{counter}} jour{% plural %}{{counter}} jours{% endblocktrans %}</strong></td>
+            </tr>
+        </tfoot>
+    </table>
+{% endblock main %}
+
+{% block script %}
+    <script>
+        jQuery(function($){
+            $('.bookmark').on('click', function(){
+                return false;
+            });
+        });
+    </script>
+{% endblock script %}

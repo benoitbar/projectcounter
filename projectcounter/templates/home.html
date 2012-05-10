@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load i18n paging_extras %}
+
+
+{% block main %}
+{% paginate projects from request as results %}
+{{ results.paging }}
+<div class="page-header">
+    <h1>{% trans "Liste des projets" %}</h1>
+</div>
+<table class="table table-striped">
+    <tbody>
+        {% for project in results.objects %}
+        <tr>
+            <td><a href="{{ project.get_absolute_url }}"><h2>{{project.name|capfirst}}</h2></a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{{ results.paging }}
+{% endblock main %}

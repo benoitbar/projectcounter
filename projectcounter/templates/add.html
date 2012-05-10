@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block main %}
+    <div class="page-header">
+        <h1>{% trans "Créer un projet" %}</h1>
+    </div>
+    <div>
+        <form class="form-horizontal" action="" method="POST">
+            <div class="control-group">
+                {% csrf_token %}
+                <table>
+                    {{form.as_table}}
+                </table>
+            <div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">{% trans "Enregistrer" %}</button>
+                <a href="{% url core.views.home %}" class="btn">{% trans "Annuler" %}</a>
+            </div>
+        </form>
+    </div>
+{% endblock main %}

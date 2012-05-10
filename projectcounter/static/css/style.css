@@ -1,0 +1,13 @@
+[class^="icon-"], [class*=" icon-"] {
+    vertical-align: baseline;
+}
+
+a.bookmark {
+    margin-left: 20px;
+    font-weight: normal;
+}
+
+tr.hr td, tr.hr th {
+    border-top-width: 1px;
+    border-top-color: #aaa;
+}
