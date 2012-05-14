@@ -25,7 +25,7 @@ class Project(models.Model):
 class CounterManager(models.Manager):
     def start(self, user, project):
         self.stop(user, project)
-        Counter(user=user, project=project).save()
+        Counter(user=user, project=project, start_date=datetime.now()).save()
 
     def stop(self, user, project):
         try:
@@ -40,7 +40,7 @@ class CounterManager(models.Manager):
 class Counter(models.Model):
     project = models.ForeignKey(Project, related_name='counters')
     user = models.ForeignKey(User, related_name='counters')
-    start_date = models.DateTimeField(default=datetime.now())
+    start_date = models.DateTimeField()
     end_date = models.DateTimeField(blank=True, null=True)
     objects = CounterManager()
 
