@@ -2,6 +2,9 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils.encoding import smart_str, smart_unicode
 from datetime import datetime
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Project(models.Model):
@@ -51,8 +54,8 @@ class Counter(models.Model):
         if self.end_date is None:
             return 0
         time = self.end_date - self.start_date
-        hours = float(time.seconds) / 60 / 60 / 8
-        return round(hours, 2)
+        days = time.days + float(time.seconds) / 60 / 60 / 8
+        return round(days, 2)
 
     class Meta:
         ordering = ['start_date']
