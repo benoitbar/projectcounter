@@ -27,6 +27,7 @@
     <table class="table table-striped">
         <thead>
             <tr>
+                <th>{% trans "Utilisateur" %}</th>
                 <th>{% trans "Début" %}</th>
                 <th>{% trans "Fin" %}</th>
                 <th>{% trans "Temps" %}</th>
@@ -35,9 +36,10 @@
         <tbody>
             {% for counter in counters %}
             <tr>
+                <td>{{counter.user.username|capfirst}}</td>
                 <td>{{counter.start_date|date:"d/m/Y à H:i:s"}}</td>
                 <td>{{counter.end_date|date:"d/m/Y à H:i:s"}}</td>
-                <td>{{counter.get_days}} {% trans "jour(s)" %}</td>
+                <td>{% blocktrans count c=counter.get_days %}{{c}} jour{% plural %}{{c}} jours{% endblocktrans %} / {% blocktrans count c=counter.get_hours %}{{c}} heure{% plural %}{{c}} heures{% endblocktrans %}
             </tr>
             {% endfor %}
         </tbody>
@@ -50,14 +52,14 @@
             {% for user_id, user_days in user_total_days.items %}
             <tr>
                 <td></td>
-                <td>{{user_days.name}}</td>
-                <td><strong>{% blocktrans count counter=user_days.days %}{{counter}} jour{% plural %}{{counter}} jours{% endblocktrans %}</strong></td>
+                <td>{{user_days.name|capfirst}}</td>
+                <td><strong>{% blocktrans count counter=user_days.days %}{{counter}} jour{% plural %}{{counter}} jours{% endblocktrans %} / <strong>{% blocktrans count counter=user_days.hours %}{{counter}} heure{% plural %}{{counter}} heures{% endblocktrans %}</strong></td>
             </tr>
             {% endfor %}
             <tr class="hr">
                 <td></td>
                 <td><big><strong>{% trans "TOTAL" %}</strong></big></td>
-                <td><big><strong>{% blocktrans count counter=total_days %}{{counter}} jour{% plural %}{{counter}} jours{% endblocktrans %}</strong></td>
+                <td><big><strong>{% blocktrans count counter=total_days %}{{counter}} jour{% plural %}{{counter}} jours{% endblocktrans %} / {% blocktrans count counter=total_hours %}{{counter}} heure{% plural %}{{counter}} heures{% endblocktrans %}</strong></td>
             </tr>
         </tfoot>
     </table>

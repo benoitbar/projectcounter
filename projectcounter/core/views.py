@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import render_to_response, get_object_or_404, redirect
@@ -15,13 +16,17 @@ def project(request, id):
     project = get_object_or_404(Project, pk=id)
     counters = project.counters.all()
     total_days = 0
+    total_hours = 0
     user_total_days = {}
     for counter in counters:
         days = counter.get_days()
+        hours = counter.get_hours()
         if counter.user.id not in user_total_days:
-            user_total_days[counter.user.id] = {'name': counter.user.username, 'days': 0}
+            user_total_days[counter.user.id] = {'name': counter.user.username, 'days': 0, 'hours': 0}
         user_total_days[counter.user.id]['days'] += days
+        user_total_days[counter.user.id]['hours'] += hours
         total_days += days
+        total_hours += hours
     is_started = False
     if request.user.is_authenticated():
         try:
@@ -29,7 +34,7 @@ def project(request, id):
             is_started = True
         except Counter.DoesNotExist:
             pass
-    return render_to_response('project.html', {'project': project, 'is_started': is_started, 'counters': counters, 'total_days': total_days, 'user_total_days': user_total_days}, context_instance=RequestContext(request))
+    return render_to_response('project.html', {'project': project, 'is_started': is_started, 'counters': counters, 'total_days': total_days, 'user_total_days': user_total_days, 'total_hours': total_hours}, context_instance=RequestContext(request))
 
 
 @login_required
