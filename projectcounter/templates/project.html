@@ -1,14 +1,15 @@
 {% extends "base.html" %}
-{% load i18n humanize %}
+{% load i18n humanize static %}
+{% load url from future %}
 
 {% block main %}
     <div class="well">
         <div class="row-fluid">
             <div class="span6">
                 <h1>
-                    {{project.name|capfirst}} ({% blocktrans count counter=total_days %} {{counter}} jour{% plural %}{{counter}} jours{% endblocktrans %})
+                    {{project.name|capfirst}}
                     {% if user.is_authenticated %}
-                    <a href="javascript:(function(){f='http://{{request.get_host}}{% url core.views.toggle request.user.id project.id %}';a=function(){if(!window.open(f,'Project Counter','location=no,links=no,scrollbars=no,toolbar=no,width=500,height=310'))location.href=f};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})()" class="bookmark btn btn-mini"><i class="icon-bookmark"></i> {{project.name|capfirst}}</a>
+                    <a href="javascript:(function(){f='http://{{request.get_host}}{% url 'core:toggle' request.user.id project.id %}';a=function(){if(!window.open(f,'Project Counter','location=no,links=no,scrollbars=no,toolbar=no,width=500,height=310'))location.href=f};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})()" class="bookmark btn btn-mini"><i class="icon-bookmark"></i> {{project.name|capfirst}}</a>
                     {% endif %}
                 </h1>
                 <p>{{project.description}}<p>
@@ -16,61 +17,68 @@
             <div class="span6">
             {% if user.is_authenticated %}
                 {% if is_started %}
-                <a href="{% url core.views.stop project.id %}" class="pull-right btn btn-danger">{% trans "Stop" %}</a>
+                <a href="{% url 'core:stop' project.id %}" class="pull-right btn btn-danger">{% trans "Stop" %}</a>
                 {% else %}
-                <a href="{% url core.views.start project.id %}" class="pull-right btn btn-primary">{% trans "Start" %}</a>
+                <a href="{% url 'core:start' project.id %}" class="pull-right btn btn-primary">{% trans "Start" %}</a>
                 {% endif %}
             {% endif %}
             </div>
         </div>
     </div>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>{% trans "Utilisateur" %}</th>
-                <th>{% trans "Début" %}</th>
-                <th>{% trans "Fin" %}</th>
-                <th>{% trans "Temps" %}</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for counter in counters %}
-            <tr>
-                <td>{{counter.user.username|capfirst}}</td>
-                <td>{{counter.start_date|date:"d/m/Y à H:i:s"}}</td>
-                <td>{{counter.end_date|date:"d/m/Y à H:i:s"}}</td>
-                <td>{% blocktrans count c=counter.get_days %}{{c}} jour{% plural %}{{c}} jours{% endblocktrans %} / {% blocktrans count c=counter.get_hours %}{{c}} heure{% plural %}{{c}} heures{% endblocktrans %}
-            </tr>
-            {% endfor %}
-        </tbody>
-        <tfoot>
-            <tr class="hr">
-                <th></th>
-                <th>{% trans "Utilisateur" %}</th>
-                <th>{% trans "Total" %}</th>
-            </tr>
-            {% for user_id, user_days in user_total_days.items %}
-            <tr>
-                <td></td>
-                <td>{{user_days.name|capfirst}}</td>
-                <td><strong>{% blocktrans count counter=user_days.days %}{{counter}} jour{% plural %}{{counter}} jours{% endblocktrans %} / <strong>{% blocktrans count counter=user_days.hours %}{{counter}} heure{% plural %}{{counter}} heures{% endblocktrans %}</strong></td>
-            </tr>
-            {% endfor %}
-            <tr class="hr">
-                <td></td>
-                <td><big><strong>{% trans "TOTAL" %}</strong></big></td>
-                <td><big><strong>{% blocktrans count counter=total_days %}{{counter}} jour{% plural %}{{counter}} jours{% endblocktrans %} / {% blocktrans count counter=total_hours %}{{counter}} heure{% plural %}{{counter}} heures{% endblocktrans %}</strong></td>
-            </tr>
-        </tfoot>
-    </table>
+    <div id="counters">
+    {% include "project.ajax.html" with counters=counters user_total_days=user_total_days total_days=total_days total_hours=total_hours %}
+    </div>
 {% endblock main %}
 
 {% block script %}
+    <script src="{% static "js/libs/jquery.jeditable.mini.js" %}"></script>
     <script>
         jQuery(function($){
+            function toSqlDate(date)
+            {
+                //format : 10/01/2013 à 10:00:23
+                var day = date.substring(0, 2);
+                var month = date.substring(3, 5);
+                var year = date.substring(6, 10);
+                var hour = date.substring(13, 15);
+                var minute = date.substring(16, 18);
+                var second = date.substring(19, 21);
+                return year+'-'+month+'-'+day+' '+hour+':'+minute+':'+second;
+            }
             $('.bookmark').on('click', function(){
                 return false;
             });
+            
+            function makeEditable()
+            {
+                $('.editable').editable(function(value, settings) {
+                    var url = $(this).data('url');
+                    var id = $(this).data('id');
+                    var start_date = toSqlDate($('#counter-'+id+'-start_date').text());
+                    var end_date = toSqlDate($('#counter-'+id+'-end_date').text());
+                    
+                    var data = {
+                        csrfmiddlewaretoken: '{{csrf_token}}',
+                        start_date: start_date,
+                        end_date: end_date
+                    }
+                    data[$(this).data('field')] = toSqlDate(value);
+                    
+                    $.post(url, data, function(data, textStatus, jqXHR) {
+                        if( textStatus == 'success' )
+                        {
+                            $('#counters').html(data);
+                            makeEditable();
+                        }
+                        else
+                        {
+                            alert("{% trans "Une erreur s'est produite. Veuillez vérifier le format de la date (dd/mm/yyyy à hh:mm:ss)" %}");
+                        }
+                    });
+                    return value;
+                });
+            }
+            makeEditable();
         });
     </script>
 {% endblock script %}

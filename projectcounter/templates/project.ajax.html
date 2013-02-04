@@ -1,0 +1,42 @@
+{% load i18n humanize static timedelta %}
+{% load url from future %}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>{% trans "Utilisateur" %}</th>
+            <th>{% trans "Début" %}</th>
+            <th>{% trans "Fin" %}</th>
+            <th>{% trans "Temps" %}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for counter in counters %}
+        <tr>
+            <td>{{counter.user.username|capfirst}}</td>
+            <td><span id="counter-{{counter.pk}}-start_date" data-id="{{counter.pk}}" data-field="start_date" data-url="{% url 'core:edit' counter.pk %}" class="editable">{{counter.start_date|date:"d/m/Y à H:i:s"}}</span></td>
+            <td>{% if counter.end_date %}<span id="counter-{{counter.pk}}-end_date" data-id="{{counter.pk}}" data-field="end_date" data-url="{% url 'core:edit' counter.pk %}" class="editable">{{counter.end_date|date:"d/m/Y à H:i:s"}}</span>{% endif %}</td>
+            <td>{% timedelta counter.start_date counter.end_date %}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr class="hr">
+            <th></th>
+            <th>{% trans "Utilisateur" %}</th>
+            <th>{% trans "Total" %}</th>
+        </tr>
+        {% for user_id, user_days in user_total_days.items %}
+        <tr>
+            <td></td>
+            <td>{{user_days.name|capfirst}}</td>
+            <td><strong>{{user_days.days|timedelta}}</strong></td>
+        </tr>
+        {% endfor %}
+        <tr class="hr">
+            <td></td>
+            <td><big><strong>{% trans "TOTAL" %}</strong></big></td>
+            <td><big><strong>{{total_days|timedelta}}</strong></td>
+        </tr>
+    </tfoot>
+</table>

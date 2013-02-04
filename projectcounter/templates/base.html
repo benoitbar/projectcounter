@@ -1,4 +1,6 @@
 {% load i18n static %}
+{% load url from future %}
+
 <!DOCTYPE html>
 <html lang="fr">
   <head>
@@ -45,19 +47,19 @@
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </a>
-            <a href="{% url core.views.home %}" class="brand">Start/Stop</a>
+            <a href="{% url 'core:home' %}" class="brand">Start/Stop</a>
             <div class="nav-collapse">
               <ul class="nav">
-                <li><a href="{% url core.views.add %}"><i class="icon-plus icon-white"></i> {% trans "Nouveau" %}</a></li>
+                <li><a href="{% url 'core:add' %}"><i class="icon-plus icon-white"></i> {% trans "Nouveau" %}</a></li>
               </ul>
               <ul class="nav pull-right">
                 {% if not user.is_authenticated %}
-                <li><a href="{% url login %}">{% trans "Connexion" %}</a></li>
+                <li><a href="{% url 'login' %}">{% trans "Connexion" %}</a></li>
                 {% else %}
                 <li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-user icon-white"></i> {{ user.username|capfirst }} <b class="caret"></b></a>
                   <ul class="dropdown-menu">
-                    <a href="{% url logout %}"><i class="icon-off"></i> {% trans "Déconnexion" %}</a>
+                    <a href="{% url 'logout' %}"><i class="icon-off"></i> {% trans "Déconnexion" %}</a>
                   </ul>
                 </li>
                 {% endif %}

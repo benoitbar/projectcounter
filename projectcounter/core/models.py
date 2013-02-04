@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.encoding import smart_str, smart_unicode
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 logger = logging.getLogger(__name__)
 
@@ -50,19 +50,11 @@ class Counter(models.Model):
     def is_started(self):
         return self.end_date is not None
 
-    def get_days(self):
+    def get_timedelta(self):
         if self.end_date is None:
-            return 0
-        time = self.end_date - self.start_date
-        days = time.days + float(time.seconds) / 60 / 60 / settings.HOURS_BY_DAY
-        return round(days, 2)
-
-    def get_hours(self):
-        if self.end_date is None:
-            return 0
-        time = self.end_date - self.start_date
-        hours = float(time.seconds) / 60 / 60
-        return round(hours, 2)
+            return timedelta(0)
+        td = self.end_date - self.start_date
+        return td
 
     class Meta:
         ordering = ['start_date']

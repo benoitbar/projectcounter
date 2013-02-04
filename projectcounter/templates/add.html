@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load url from future %}
 
 {% block main %}
     <div class="page-header">
@@ -15,7 +16,7 @@
             <div>
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">{% trans "Enregistrer" %}</button>
-                <a href="{% url core.views.home %}" class="btn">{% trans "Annuler" %}</a>
+                <a href="{% url 'core:home' %}" class="btn">{% trans "Annuler" %}</a>
             </div>
         </form>
     </div>
