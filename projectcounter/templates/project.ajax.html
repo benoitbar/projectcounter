@@ -30,13 +30,13 @@
         <tr>
             <td></td>
             <td>{{user_days.name|capfirst}}</td>
-            <td><strong>{{user_days.days|timedelta}}</strong></td>
+            <td><strong>{{user_days.days|timedelta}}</strong> ({% blocktrans count counter=user_days.days|business_days %}{{counter}} jour{% plural %}{{counter}} jours{% endblocktrans %})</td>
         </tr>
         {% endfor %}
         <tr class="hr">
             <td></td>
             <td><big><strong>{% trans "TOTAL" %}</strong></big></td>
-            <td><big><strong>{{total_days|timedelta}}</strong></td>
+            <td><big><strong>{{total_days|timedelta}}</strong> ({% blocktrans count counter=total_days|business_days %}{{counter}} jour{% plural %}{{counter}} jours{% endblocktrans %})</td>
         </tr>
     </tfoot>
 </table>

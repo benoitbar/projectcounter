@@ -38,7 +38,7 @@ def timesince(d, now=datetime.now(), timedelta=False):
     else:
         delta = now - d
     # ignore microseconds
-    since = delta.days * settings.HOURS_BY_DAY * 60 * 60 + delta.seconds
+    since = delta.days * 24 * 60 * 60 + delta.seconds
     if since <= 0:
         # d is in the future compared to now, stop processing.
         return '0 ' + ugettext('minutes')
@@ -83,3 +83,9 @@ class TimedeltaNode(template.Node):
 @register.filter(name="timedelta")
 def timedelta(value):
     return timesince(value, timedelta=True)
+
+
+@register.filter(name="business_days")
+def business_days(value):
+    days = ((value.days * 24) + float(value.seconds) / 60 / 60) / settings.HOURS_BY_DAY
+    return round(days, 2)
